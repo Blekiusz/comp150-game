@@ -78,11 +78,11 @@ class MusicGenerator:
     currentNote = 2
     currentNote2 = 1
 
-    multiplier = 2
+    multiplier = 6
     sample_rate = 44100
     songRate = sample_rate * multiplier
 
-    volume = 0      # TODO: change back to 0.5
+    volume = 0.1
 
     song_point = 0.1
 
@@ -103,11 +103,9 @@ class MusicGenerator:
             else:
                 self.current_chord = 1
 
-        print(self.song_point)
-
     def snare(self):
         """
-        Create a snare sound using noise and play it every 4th note.
+        Generate a snare sound using noise and play it every 4th note.
 
         :return:
         """
@@ -121,7 +119,7 @@ class MusicGenerator:
 
     def hi_hat(self):
         """
-        Create a hi-hat sound using noise and play it every note.
+        Generate a hi-hat sound using noise and play it every note.
 
         :return:
         """
@@ -135,11 +133,11 @@ class MusicGenerator:
 
     def melody(self):
         """
-        Create a melody using the current chord notes.
+        Generate a melody using the current chord notes.
 
         :return:
         """
-        tempo = 10
+        tempo = 6
         if self.currentProgress == self.songRate / (tempo * self.multiplier):
 
             self.melody_frequency_1 = random.choice(
@@ -167,6 +165,14 @@ class MusicGenerator:
                     i / float(self.sample_rate))) * (
                     volume * max_sample_value)
         return sample_value
+
+    @staticmethod
+    def square_wave(sine_wave):
+        """Return values of a square wave."""
+        if sine_wave > 0:
+            return 1
+        else:
+            return -1
 
     def fade_out(self, i):
         """
@@ -210,24 +216,27 @@ class MusicGenerator:
             self.hi_hat(self)
             self.melody(self)
 
+            number_of_values = 5
+
             # create the sine wave values for each sound
             sample_value = self.create_value(self, i, self.melody_frequency_1,
-                                             self.volume / 4)
+                                             self.volume / number_of_values)
             sample_value2 = self.create_value(self, i, self.melody_frequency_2,
-                                              self.volume / 4)
+                                              self.volume / number_of_values)
             sample_value3 = self.create_value(self, i, self.snare_frequency,
-                                              self.volume / 4)
+                                              self.volume / number_of_values)
             sample_value4 = self.create_value(self, i, self.hi_hat_frequency,
-                                              self.volume / 4)
+                                              self.volume / number_of_values)
 
-            print(sample_value + sample_value2 +
-                  sample_value3 + sample_value4)
+            square_wave_sample_value = sample_value * 2 * self.square_wave(
+                sample_value) * 0.5
 
             # pack all of the values together
             packed_value = struct.pack('i', int(sample_value
                                                 + sample_value2
                                                 + sample_value3
-                                                + sample_value4))
+                                                + sample_value4
+                                                + square_wave_sample_value))
 
             # append the packed value into the values list
             for j in range(0, wav_write .getnchannels()):
@@ -259,9 +268,6 @@ def main():
                 if event.key == K_SPACE:
                     # Generate and play the track
                     MusicGenerator.generate_track(MusicGenerator)
-                    print(str(MusicGenerator.filename
-                              + str(MusicGenerator.current_track)
-                              + MusicGenerator.filetype))
                     pygame.mixer.music.load(str(MusicGenerator.filename
                                             + str(MusicGenerator.current_track)
                                             + MusicGenerator.filetype))

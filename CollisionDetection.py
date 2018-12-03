@@ -147,8 +147,7 @@ class CollisionDetector:
             # and let the player press space to restart
             if self.current_tile_type == 2 \
                     and self.current_tile_material == 1:
-                    dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator,
-                                                  False, True)
+                    dunGen.DungeonGenerator.reset(dunGen.DungeonGenerator)
                     if self.current_tile_pos[1] <\
                             dunGen.DungeonGenerator.player.position[1]:
                         dunGen.DungeonGenerator.bottom_col = True

@@ -1,5 +1,6 @@
 """
-Loads and saves files
+Load and save files.
+
 Driver: Ashley
 """
 import pathlib
@@ -8,14 +9,13 @@ import os
 
 def load_files_form_directory(directory, file_type):
     """
-    gets a list of files in a directory. does not include sub folders.
-    also un-sets EditorStore.update_image_directory.
+    Get a list of files in a directory. Do not include sub folders.
 
+    Also un-set EditorStore.update_image_directory.
     :param directory:   the directory to search.
     :param file_type:   the extension so search for.
     :return:            list of files including directory.
     """
-
     file_list = []
     files = pathlib.Path(directory)
 
@@ -29,14 +29,13 @@ def load_files_form_directory(directory, file_type):
 
 def get_file_names_in_directory(directory, file_type):
     """
-    gets a list of files in a directory. does not include sub folders.
-    also un-sets EditorStore.update_image_directory.
+    Get a list of files in a directory. Do not include sub folders.
 
+    Also un-set EditorStore.update_image_directory.
     :param directory:   the directory to search.
     :param file_type:   the extension so search for.
     :return:            list of files names only (excluding directory).
     """
-
     file_list = []
     files = pathlib.Path(directory)
 

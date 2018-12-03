@@ -31,15 +31,16 @@ def draw_light(surface, other_script):
     :return:            No return.
     """
     current_tile_x, current_tile_y = other_script.DungeonGenerator.\
-        get_coordinates_from_position(other_script.DungeonGenerator.player.position[0],
-                                      other_script.DungeonGenerator.player.position[1],
-                                      (0.5, 0.85))
+        get_coordinates_from_position(
+            other_script.DungeonGenerator.player.position[0],
+            other_script.DungeonGenerator.player.position[1], (0.5, 0.85))
 
     current_tile_x -= ((Variables.light_range - 1) // 2)
     current_tile_y -= ((Variables.light_range - 1) // 2)
 
     pos_x, pos_y = other_script.DungeonGenerator.\
-        get_positon_by_tile_coordinates(other_script.DungeonGenerator, current_tile_x, current_tile_y)
+        get_positon_by_tile_coordinates(
+            other_script.DungeonGenerator, current_tile_x, current_tile_y)
 
     surface.blit(Variables.light_surface, (pos_x, pos_y))
 

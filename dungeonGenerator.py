@@ -52,7 +52,7 @@ class DungeonGenerator:
     end_x = []
     end_y = []
     # todo rename level count to room count
-    START_LEVEL_COUNT = 3
+    START_LEVEL_COUNT = 2
     levelCount = 2
     current_dungeon = 0
     levels = []
@@ -71,6 +71,9 @@ class DungeonGenerator:
     reset_fuel = False
     add_fuel = False
 
+    load_count = 1
+    current_loaded = 0
+
     for num in range(levelCount):
         levels.append(pygame.Surface)
         starting_point_x.append(0)
@@ -84,8 +87,18 @@ class DungeonGenerator:
             self.current_dungeon = 0
 
         self.well_room = first_scene
-        self.reset_fuel = True  # fuel_meter.add_fuel() # reset_fuel()
         self.levelCount = self.START_LEVEL_COUNT + self.current_dungeon
+        self.starting_point_x.clear()
+        self.starting_point_y.clear()
+        self.levels.clear()
+        for num in range(self.levelCount):
+            self.levels.append(pygame.Surface)
+            self.starting_point_x.append(0)
+            self.starting_point_y.append(0)
+
+        if is_reset:
+            self.reset_fuel = True  # fuel_meter.add_fuel() # reset_fuel()
+
         floorTilesX.clear()
         floorTilesY.clear()
         wallTiles.clear()
@@ -106,24 +119,36 @@ class DungeonGenerator:
 
     def create_dungeon(self):
         """Generate the dungeon."""
+
         # reset all lists
+        self.load_count = len(self.levels)
+        self.current_loaded = 0
+
         library.RESET = True
         for i in range(len(self.levels)):
             if i > 0:
                 self.gen_rand_map_tiles(self, i)
-                print(self.start_x)
-                print(self.end_x)
+
                 # set the starting point for the next room
                 self.starting_point_x[i] = \
                     self.starting_point_x[i - 1] + \
-                    self.end_x[i-1] * TILE_SIZE - (self.start_x[i-1] * TILE_SIZE)
+                    self.end_x[i-1] * TILE_SIZE - \
+                    (self.start_x[i-1] * TILE_SIZE)
 
                 self.starting_point_y[i] = \
                     self.starting_point_y[i - 1] + \
                     self.end_y[i-1] * TILE_SIZE
+            else:
+                # create the room
+                self.gen_rand_map_tiles(self, i)
 
-            # create the room
-            self.gen_rand_map_tiles(self, i)
+            self.current_loaded += 1
+            loading_x_position = (main.WINDOW_WIDTH/2) - 200;
+            library.loading_bar(main.screen,
+                                (loading_x_position, 300, 400, 250),
+                                self.current_loaded / self.load_count
+                                )
+
             self.initialize_level(self, i)
             self.gen_chest_map(self, i)
 
@@ -158,7 +183,8 @@ class DungeonGenerator:
             main.screen.blit(tile_class.tileTypes[3][0], (x_pos,
                                                           y_pos,
                                                           TILE_SIZE,
-                                                          TILE_SIZE))
+                                                          TILE_SIZE)
+                             )
 
     def gen_rand_map_tiles(self, instance):
         """
@@ -189,6 +215,8 @@ class DungeonGenerator:
         tiles.clear()
         tileTypes.clear()
         tileMats.clear()
+
+        self.load_count += (self.MAP_WIDTH * self.MAP_HEIGHT)
 
         # Scroll through each pixel in a map and assign according tiles
         # depending on the pixel brightness.
@@ -234,6 +262,15 @@ class DungeonGenerator:
                 material = choices(material_types, material_weights)[0]
                 # horizontal row of materials
                 mat_row.append(material)
+
+                #update loaded count
+                self.current_loaded += 1
+
+            loading_x_position = (main.WINDOW_WIDTH/2) - 200
+            library.loading_bar(main.screen,
+                                (loading_x_position, 300, 400, 250),
+                                self.current_loaded / self.load_count
+                                )
 
             # vertical column of horizontal tile rows
             tiles.append(tile_row)
@@ -322,18 +359,40 @@ class DungeonGenerator:
             (DungeonGenerator.MAP_WIDTH * TILE_SIZE,
              DungeonGenerator.MAP_HEIGHT * TILE_SIZE))
 
-        # generate material variations
-        while DungeonGenerator.mud_variations > 0:
-            for i in range(len(tile_class.tileTypes[1])):
-                tile_class.generate_material(1, i, 1, DungeonGenerator.
-                                             mud_variations)
-            DungeonGenerator.mud_variations -= 1
+        self.load_count += len(tile_class.tileTypes[1]) * \
+                           DungeonGenerator.mud_variations
+        self.load_count += len(tile_class.tileTypes[1]) * \
+                           DungeonGenerator.moss_variations
 
-        while DungeonGenerator.moss_variations > 0:
-            for i in range(len(tile_class.tileTypes[1])):
-                tile_class.generate_material(1, i, 2, DungeonGenerator.
-                                             moss_variations)
-            DungeonGenerator.moss_variations -= 1
+        # generate material variations
+        while DungeonGenerator.mud_variations > 0 or \
+                DungeonGenerator.moss_variations > 0:
+
+
+
+            if self.mud_variations > 0:
+                for i in range(len(tile_class.tileTypes[1])):
+                    tile_class.generate_material(1, i, 1, DungeonGenerator.
+                                                 mud_variations)
+                    self.current_loaded += 1
+                DungeonGenerator.mud_variations -= 1
+
+            if self.moss_variations > 0:
+                for i in range(len(tile_class.tileTypes[1])):
+                    tile_class.generate_material(1, i, 2, DungeonGenerator.
+                                                 moss_variations)
+                    self.current_loaded += 1
+                DungeonGenerator.moss_variations -= 1
+
+            loading_x_position = (main.WINDOW_WIDTH / 2) - 200
+            library.loading_bar(main.screen,
+                                (loading_x_position, 300, 400, 250),
+                                self.current_loaded / self.load_count
+                                )
+
+        self.load_count += (DungeonGenerator.MAP_HEIGHT *
+                            DungeonGenerator.MAP_WIDTH
+                            )
 
         # draw the tiles to the level surface
         for column in range(DungeonGenerator.MAP_HEIGHT):
@@ -465,3 +524,264 @@ class DungeonGenerator:
             weights.append(random.random())
 
         return weights
+
+    @staticmethod
+    def get_edge_name_from_move_direction(move_direction):
+        """
+        Get the related edge name for move direction.
+
+        Driver: Ashley
+        :param move_direction: name of move direction
+        :return:               name of edge corresponding to the move direction
+        """
+        if move_direction == "forwards":
+            return "top"
+        elif move_direction == "right":
+            return "right"
+        elif move_direction == "backwards":
+            return "bottom"
+        elif move_direction == "left":
+            return "left"
+        else:
+            print(
+                "Error: direction (",
+                move_direction,
+                ") not fond (DungGen.get_edge_name_from_move_direction)"
+            )
+
+    def get_collider_edge(self, edge_name):
+        """
+        Get players collider edges value.
+
+        Driver: Ashley
+        :param edge_name:   Name of edge to reset
+        :return:            Value of the player collider edges
+        """
+        if edge_name == "top":
+            return self.top_col
+        elif edge_name == "right":
+            return self.right_col
+        elif edge_name == "bottom":
+            return self.bottom_col
+        elif edge_name == "left":
+            return self.left_col
+        else:
+            print(
+                "Error: Edge (",
+                edge_name,
+                ") not fond (DungGen.get_collider_edge)"
+            )
+
+    def reset_collider_edge(self, edge_name):
+        """
+        Reset collider edge.
+
+        Driver: Ashley
+        :param edge_name:   Name of edge to reset
+        :return:            None
+        """
+        if edge_name == "top":
+            self.top_col = False
+        elif edge_name == "right":
+            self.right_col = False
+        elif edge_name == "bottom":
+            self.bottom_col = False
+        elif edge_name == "left":
+            self.left_col = False
+        else:
+            print(
+                "Error: Edge (",
+                edge_name,
+                ") not fond (DungGen.reset_collider_edge)"
+            )
+
+    def update_position(self,
+                        move_direction,
+                        move_amount,
+                        previous_position=None
+                        ):
+        """
+        Update dungeon position.
+
+        Driver: Ashley
+        :param move_direction:      name of direction to move in
+        :param move_amount:         amount to move
+        :param previous_position:   if None its set to position
+        :return:                    None
+        """
+        if move_direction == "forwards" or move_direction == "backwards":
+            if previous_position is None:
+                self.previousY = self.y
+            else:
+                self.previousY = previous_position
+
+            self.y += move_amount
+
+        else:
+            if previous_position is None:
+                self.previousX = self.x
+            else:
+                self.previousX = previous_position
+
+            self.x += move_amount
+
+    def get_axis_position_from_move_direction(self, move_direction):
+        """
+        Get position of an axis corresponding to the move direction.
+
+        Driver: Ashley
+        :param move_direction:  name of direction to get the position of
+        :return:                position of the corresponding axis
+        """
+        if move_direction == "forwards" or move_direction == "backwards":
+            return self.y
+        else:
+            return self.x
+
+    def get_axis_previous_position_from_move_direction(self, move_direction):
+        """
+        Get previous position of an axis corresponding to the move direction.
+
+        Driver: Ashley
+        :param move_direction:  name of direction to get the position of
+        :return:                previous position of the corresponding axis
+        """
+        if move_direction == "forwards" or move_direction == "backwards":
+            return self.previousY
+        else:
+            return self.previousX
+
+    def set_prediction(self,
+                       move_direction,
+                       main_value=None,
+                       secondary_value=None
+                       ):
+        """
+        Set main and secondary values corresponding to move direction.
+
+        Driver: Ashley
+        :param move_direction:
+        :param main_value:          value to set main prediction
+                                    (ignored if None)
+        :param secondary_value:     value to set secondary prediction
+                                    (ignored if None)
+        :return:                    None
+        """
+        if move_direction == "forwards" or move_direction == "backwards":
+            if main_value is not None:
+                self.prediction_Y = main_value
+
+            if secondary_value is not None:
+                self.secondary_prediction_Y = secondary_value
+
+        else:
+            if main_value is not None:
+                self.prediction_X = main_value
+
+            if secondary_value is not None:
+                self.secondary_prediction_X = secondary_value
+
+    def update_dungeon(self,
+                       move_direction,
+                       opposite_move_direction,
+                       move_amount,
+                       prediction_value,
+                       other_direction_1,
+                       other_direction_2
+                       ):
+        """
+        Update the dungeon position.
+
+        Driver: Ashley
+        :param move_direction:              Direction to test if moving
+        :param opposite_move_direction:     Opposite direction of move test
+        :param move_amount:                 Amount to move
+        :param prediction_value:            Prediction value
+        :param other_direction_1:           One of the other two directions
+        :param other_direction_2:           The other, other direction.
+        :return:                            None
+        """
+        if (library.KEY_PRESSED[move_direction] and
+                not library.KEY_PRESSED[opposite_move_direction]):
+            # Get names of all the edges so its orientated correctly
+            move_direction_edge_name = \
+                self.get_edge_name_from_move_direction(
+                    move_direction
+                    )
+
+            opposite_move_direction_edge_name = \
+                self.get_edge_name_from_move_direction(
+                    opposite_move_direction
+                    )
+
+            other_direction_1_edge_name = \
+                self.get_edge_name_from_move_direction(
+                    other_direction_1
+                    )
+
+            other_direction_2_edge_name = \
+                self.get_edge_name_from_move_direction(
+                    other_direction_2
+                    )
+
+            self.reset_collider_edge(self, opposite_move_direction_edge_name)
+
+            if not self.get_collider_edge(self, move_direction_edge_name):
+                # move the dungeon and assign prediction values
+                prv_axis_position = \
+                    self.get_axis_position_from_move_direction(
+                        self,
+                        move_direction
+                        )
+
+                self.update_position(
+                    self,
+                    move_direction,
+                    move_amount,
+                    prv_axis_position
+                    )
+
+                self.set_prediction(
+                    self,
+                    move_direction,
+                    main_value=prediction_value
+                    )
+
+                if not (library.KEY_PRESSED[other_direction_1] or
+                        library.KEY_PRESSED[other_direction_2]):
+                    self.set_prediction(
+                        self,
+                        other_direction_1,
+                        main_value=0,
+                        secondary_value=0
+                        )
+
+                if not (self.get_collider_edge(self,
+                                               other_direction_1_edge_name
+                                               ) or
+                        self.get_collider_edge(self,
+                                               other_direction_2_edge_name
+                                               )):
+                    self.set_prediction(
+                        self,
+                        move_direction,
+                        secondary_value=prediction_value
+                    )
+
+            else:
+                self.set_prediction(self, move_direction, main_value=0)
+
+                current_pos = \
+                    self.get_axis_position_from_move_direction(
+                        self,
+                        move_direction
+                    )
+
+                prv_pos = \
+                    self.get_axis_previous_position_from_move_direction(
+                        self,
+                        move_direction
+                    )
+
+                if current_pos != prv_pos:
+                    self.update_position(self, move_direction, 0)

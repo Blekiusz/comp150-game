@@ -1,3 +1,4 @@
+"""SOUND EFFECTS."""
 import pygame
 import library
 import wave
@@ -5,12 +6,12 @@ import struct
 
 
 class SoundFX:
-    """
-    load and save wav files and soundEffects library
-    """
+    """Load and save wav files and soundEffects library."""
+
     playing = False
     echo_playing = False
-    footstep_sound = None # pygame.mixer.Sound('./Game Sounds/Foot Steps.wav')
+    # pygame.mixer.Sound('./Game Sounds/Foot Steps.wav')
+    footstep_sound = None
     echo_footprint_sound = None
     volume = 0
     sample_data = []
@@ -18,14 +19,22 @@ class SoundFX:
     MAX_VOLUME = 32767
 
     def __init__(self, vol=0.7):
+        """Initialize."""
+        
+        if library.SOUND_HAS_INITIALIZED is None:
+            return
+
         self.playing = False
-        self.echo_footprint_sound = pygame.mixer.Sound('Game Sounds/Foot Steps Echo.wav')
-        self.footstep_sound = pygame.mixer.Sound('Game Sounds/Foot Steps.wav')
+        self.echo_footprint_sound = pygame.mixer.Sound(
+            'Game Sounds/Foot Steps Echo.wav')
+        self.footstep_sound = pygame.mixer.Sound(
+            'Game Sounds/Foot Steps.wav')
         self.volume = vol
 
     def normalise(self, mutiplyer):
         """
-        normalise sample data
+        Normalise sample data.
+
         :return:
         """
         largest = 0
@@ -42,7 +51,7 @@ class SoundFX:
             self.sample_data[s] = louder
 
     def abs(self, value):
-
+        """Force a positive value."""
         if value < 0:
             return - value
 
@@ -50,7 +59,8 @@ class SoundFX:
 
     def save_wav_file(self, filename):
         """
-        saves sample data to wav file
+        Save sample data to wav file.
+
         :param filename: the wav file name
         :return:
         """
@@ -60,14 +70,16 @@ class SoundFX:
             sample_bytes.append(struct.pack('h', int(self.sample_data[i])))
         byte_string = b''.join(sample_bytes)
         save_file = wave.open(filename + ".wav", "w")
-        save_file.setparams((1, 2, self.SAMPLE_RATE, len(self.sample_data), "NONE", "not compressed"))
+        save_file.setparams((1, 2, self.SAMPLE_RATE, len(self.sample_data),
+                             "NONE", "not compressed"))
         save_file.writeframesraw(byte_string)
         save_file.close()
         print(filename, " file saved")
 
     def read_wav_file(self, filename):
         """
-        reads wav file into sample data
+        Read wav file into sample data.
+
         :param filename: the wav filename
         :return:
         """
@@ -83,6 +95,8 @@ class SoundFX:
 
     def generate_echo(self, volume, start_sample, sample_len, delay):
         """
+        Generate an echo.
+
         :param volume: Echo volume
         :param start_sample: sample to start echoing from
         :param sample_len: length of the echo
@@ -90,7 +104,8 @@ class SoundFX:
         :return: None
         """
         self.SAMPLE_RATE
-        echo_samples = self.sample_data[start_sample: start_sample + (sample_len * self.SAMPLE_RATE)]
+        echo_samples = self.sample_data[start_sample: start_sample + (
+                sample_len * self.SAMPLE_RATE)]
         echo_samp_index = 0
         for i in range(start_sample + delay, len(self.sample_data)):
             self.sample_data[i] += echo_samples[echo_samp_index] * volume
@@ -104,7 +119,8 @@ class SoundFX:
 
     def apply_echo(self):
         """
-        applies the echo to the .wav file.
+        Apply the echo to the .wav file.
+
         :return:
         """
         self.read_wav_file('Game Sounds/Foot Steps')
@@ -113,7 +129,8 @@ class SoundFX:
 
     def play_echo_sound(self):
         """
-        plays the echo wav file that was created.
+        Play the echo wav file that was created.
+
         :return:
         """
         if self.echo_playing is False:
@@ -121,18 +138,24 @@ class SoundFX:
 
     def play_footprint(self):
         """
-        checks whether the keys are being pressed and plays the sound
-        checks if the keys are no longer being pressed and stops the sound
+        Check whether the keys are being pressed and play the sound.
+
+        Check if the keys are no longer being pressed and stop the sound.
         :return:
         """
-        if not self.playing and (library.KEY_PRESSED["backwards"] or library.KEY_PRESSED["forwards"] or
-                                 library.KEY_PRESSED["right"]
+        if library.SOUND_HAS_INITIALIZED is None:
+            return
+
+        if not self.playing and (library.KEY_PRESSED["backwards"]
+                                 or library.KEY_PRESSED["forwards"]
+                                 or library.KEY_PRESSED["right"]
                                  or library.KEY_PRESSED["left"]):
-            self.footstep_sound.play(0)
+            self.footstep_sound.play(-1)
             self.footstep_sound.set_volume(self.volume)
             self.playing = True
-        elif self.playing and not (library.KEY_PRESSED["backwards"] or library.KEY_PRESSED["forwards"] or
-                                   library.KEY_PRESSED["right"]
+        elif self.playing and not (library.KEY_PRESSED["backwards"]
+                                   or library.KEY_PRESSED["forwards"]
+                                   or library.KEY_PRESSED["right"]
                                    or library.KEY_PRESSED["left"]):
             self.footstep_sound.stop()
             self.playing = False

@@ -3,12 +3,10 @@
 # Search '__Add_new__' for places to add new menus, edit windows,
 # buttons & button function
 
-
 import pygame
 import sys
 import library
 import UI
-# import pathlib
 import loadSave
 import os
 import image_effects
@@ -21,6 +19,7 @@ class EditorStore:
 
     # has the editor been initialized
     initialized = False
+    game_state = None
     update_image_directory = False
     current_directory = "./Well Escape tiles"
     # stores the tile paths from the current directory
@@ -128,12 +127,11 @@ save_text_input = UI.UIInput((400, 50), 30)
 
 def initialize():
     """
-    initialize the Editor.
-    This should only be run once.
+    Initialize the Editor.
 
+    This should only be run once.
     :return: None.
     """
-
     print("Helloo World!!!!")
 
     # set current menu to start
@@ -256,21 +254,20 @@ def initialize():
 
 def get_files_in_directory(directory, file_type):
     """
-    gets a list of files in a directory. does not include sub folders.
-    also un-sets EditorStore.update_image_directory.
+    Get a list of files in a directory. Do not include sub folders.
 
+    Also un-set EditorStore.update_image_directory.
     :param directory:   the directory to search.
     :param file_type:   the extension so search for.
     :return:            list of files in directory with extension.
     """
-
     EditorStore.update_image_directory = False
 
     return loadSave.load_files_form_directory(directory, file_type)
 
 
 def display_select_tile():
-    """updates the images form directory and call the button display."""
+    """Update the images form directory and call the button display."""
     if EditorStore.update_image_directory:
         EditorStore.directory_tiles = get_files_in_directory(
             EditorStore.current_directory, ".png"
@@ -283,8 +280,9 @@ def display_select_tile():
 
 def display_select_tile_button():
     """
-    Draws the tile select buttons to
-    screen and selects the tile for edit if pressed.
+    Draw the tile select buttons to screen.
+
+    Select the tile for edit if pressed.
     """
     # todo: optimize this so the buttons are called from the main button
     # function so they don't get draw every frame
@@ -296,7 +294,8 @@ def display_select_tile_button():
         EditorStore.select_tile_start_position = len(
             EditorStore.directory_tiles) - 4
 
-    if EditorStore.select_tile_start_position + 3 < len(EditorStore.directory_tiles):
+    if EditorStore.select_tile_start_position + 3 < len(
+            EditorStore.directory_tiles):
         select_tile_end_position = EditorStore.select_tile_start_position + 4
     else:
         select_tile_end_position = len(EditorStore.directory_tiles)
@@ -337,8 +336,8 @@ def display_select_tile_button():
 
 
 def select_tile(image_path_id):
-    """Loads the preview tiles from current directory."""
-    # todo this can also get move into display_sellect_tile once optimized
+    """Load the preview tiles from current directory."""
+    # todo this can also get move into display_select_tile once optimized
     EditorStore.edit_tile = pygame.image.load(
         EditorStore.directory_tiles[image_path_id]
     )
@@ -347,7 +346,7 @@ def select_tile(image_path_id):
 
 
 def display_tile_editor():
-    """Displays the main tile editor."""
+    """Display the main tile editor."""
     # get the tile size and work out the new size when zoomed
     zoomed_size_x, zoomed_size_y = EditorStore.edit_tile.get_size()
     zoomed_size_x = int(zoomed_size_x * EditorStore.tile_zoom)
@@ -389,12 +388,11 @@ def display_tile_editor():
 
 def display_fx_panel(panel_id):
     """
-    Displays the FX pannel for the selected fx.
+    Display the FX panel for the selected fx.
 
     :param panel_id:    fx id
     :return:            None
     """
-
     # total amount of panels (varies depending on fx)
     total_options = 1
     # stores the effect input values
@@ -449,7 +447,7 @@ def display_fx_panel(panel_id):
         elif EditorStore.current_fx_options == 2:
             fx_panel_header("Base Color")
             # todo add base colors
-    # blur pannel
+    # blur panel
     elif panel_id == FX_BLUR:
         fx_panel_header("Blend Tolerance")
         option_value = draw_slider(0, "Amount")
@@ -521,14 +519,13 @@ def display_fx_panel(panel_id):
 
 def rgb_sliders(header, display_color_box, label=("Red", "Green", "Blue")):
     """
-    Draws the RGB sliders.
+    Draw the RGB sliders.
 
     :param header:              pannel header.
     :param display_color_box:   should the color preview be displayed.
     :param label:               slider labels=("red, "green", "blue").
     :return:                    color (r, g, b).
     """
-
     # display panel header as rgb is a single panel
     fx_panel_header(header)
 
@@ -600,7 +597,7 @@ def rgb_sliders(header, display_color_box, label=("Red", "Green", "Blue")):
 
 def draw_slider(slider_id, label, min_value=0, max_value=1):
     """
-    draws a slider from the slider list.
+    Draw a slider from the slider list.
 
     :param slider_id:   slider list id.
     :param label:       slider label.
@@ -632,8 +629,7 @@ def draw_slider(slider_id, label, min_value=0, max_value=1):
 
 
 def reset_slider_values():
-    """Resets all the slider value to the default 0.5"""
-
+    """Reset all the slider values to the default 0.5."""
     sliders_r.set_value(0.5)
     sliders_g.set_value(0.5)
     sliders_b.set_value(0.5)
@@ -643,7 +639,7 @@ def reset_slider_values():
 
 
 def fx_panel_header(header):
-    """displays the fx panel header."""
+    """Display the fx panel header."""
     screen.blit(
         get_label(
             header, sub_header_fontface, (250, 50),
@@ -654,7 +650,7 @@ def fx_panel_header(header):
 
 def label_button(button_surface, text, fontface, x_position, y_position):
     """
-    Adds labels to buttons.
+    Add labels to buttons.
 
     :param button_surface:  Button template to copy.
     :param text:            Test to display on button.
@@ -677,7 +673,7 @@ def label_button(button_surface, text, fontface, x_position, y_position):
 def get_label(text, fontface, size,
               text_color=(0, 0, 0, 255), background_color=(255, 255, 255, 0)):
     """
-    creates a text label
+    Create a text label.
 
     :param text:                Label text.
     :param fontface:            Fontface.
@@ -686,7 +682,6 @@ def get_label(text, fontface, size,
     :param size:                label size (x, y).
     :return:                    label surface.
     """
-
     label_surface = pygame.Surface(size, pygame.SRCALPHA)
     label_surface.fill(background_color)
     label_surface.blit(fontface.render(text, True, text_color), (5, 5))
@@ -695,7 +690,7 @@ def get_label(text, fontface, size,
 
 
 def draw_menu_buttons():
-    """Draws buttons for the current menu"""
+    """Draw buttons for the current menu."""
     # loop button for the current menu
     for bt in list(button_type):
         for b in EditorStore.current_menu_buttons:
@@ -715,12 +710,11 @@ def draw_menu_buttons():
 
 def get_button_type_fontface(button_type_name):
     """
-    get the font face for a button type.
+    Get the font face for a button type.
 
     :param button_type_name:    type of button.
     :return:                    fontface for button type.
     """
-
     # __Add_new__
     # Add font face for button types to if statement
     if button_type_name == "fx":
@@ -730,7 +724,7 @@ def get_button_type_fontface(button_type_name):
 
 
 def button_pressed():
-    """Finds if any buttons are pressed in the current menu."""
+    """Find if any buttons are pressed in the current menu."""
     # tile select buttons are in display_select_tile_button()
 
     # loop events to look for mouse up on button 1
@@ -764,8 +758,7 @@ def button_pressed():
 
 
 def button_action(action_type, button_data=None):
-    """Runs the pressed buttons action."""
-
+    """Run the pressed buttons action."""
     # __Add_new__
     # Add new button actions to if statement
     if action_type == "return":
@@ -776,7 +769,7 @@ def button_action(action_type, button_data=None):
             if standalone_mode:
                 quit()
             # un-set the editor
-            library.EDITOR = False
+            EditorStore.game_state.set_state("main menu")
             # Set buttons back to start menu so
             # if we return to editor its good to go.
             EditorStore.current_menu_buttons = start_menu_button_data
@@ -831,20 +824,19 @@ def button_action(action_type, button_data=None):
 
 def set_menu(menu_id, buttons=None):
     """
-    Sets the current menu.
+    Set the current menu.
 
     :param menu_id:     menu id to set to.
     :param buttons:     the menus buttons (if none button remain the same).
     :return:            None.
     """
-
     EditorStore.current_menu = menu_id
     if buttons is not None:
         EditorStore.current_menu_buttons = buttons
 
 
 def run_effect(effect_id):
-    """Calls the effect in image_effects."""
+    """Call the effect in image_effects."""
     # and sorts the effect input data out
     # effect data in inputted into the effect_input_data in the order of the
     # effects option panel
@@ -890,7 +882,7 @@ def run_effect(effect_id):
 
     image_effects.run_effect(
         effect_id, EditorStore.edit_tile, effect_inputs,
-        (loading_bar, screen, (0, 0, WINDOW_WIDTH, 50)
+        (library.loading_bar, screen, (0, 0, WINDOW_WIDTH, 50)
          )
     )
 
@@ -900,8 +892,9 @@ def run_effect(effect_id):
 
 def resize_preview_image(preview_image):
     """
-    get the size of an image when srunk to TILE_SIZE, keeping the aspect ratio.
+    Get the size of an image when shrunk to TILE_SIZE.
 
+    Keep the aspect ratio.
     :param preview_image:   surface size (width, height).
     :return:                new resized surface size.
     """
@@ -919,33 +912,14 @@ def resize_preview_image(preview_image):
     )
 
 
-def loading_bar(surface, rect, percent):
-    """
-    Displays a loading bar on surface and updates display.
-
-    :param surface: surface to display loading bar on.
-    :param rect:    the position and size of the loading bar
-    (x, y, width, height).
-    :param percent: the loading percentage.
-    :return:        None.
-    """
-    text_surface = text_fontface.render("Loading", True, library.BLACK)
-    pygame.draw.rect(surface, library.GREY, rect)
-    pygame.draw.rect(
-        surface, library.WHITE,
-        (rect[0] + 5, rect[1] + 5, (rect[2] - 10) * percent, rect[3] - 8)
-    )
-    surface.blit(text_surface, (50, 10))
-    pygame.display.flip()
-
-
 def set_directory(directory):
+    """Set the directory."""
     EditorStore.current_directory = directory
     EditorStore.update_image_directory = True
 
 
 def text_input(event, current_text, ui_text_input):
-    """get text input event"""
+    """Get text input event."""
     if not ui_text_input.has_focus(
             pygame.mouse.get_pos(), library.KEY_PRESSED["mouse"], (50, 100)
     ):
@@ -984,7 +958,6 @@ def display():
 
     Driver: Ashley Sands, Navigator: N/A.
     """
-
     # initialize the editor
     if not EditorStore.initialized:
         initialize()
@@ -1013,7 +986,7 @@ def display():
 
 
 def save_tile(surface, path, file_name):
-    """save the image as a png."""
+    """Save the image as a png."""
     # todo check if file already exist
     if len(file_name) == 0:
         print("Error: Unable to save no file name")
@@ -1031,7 +1004,7 @@ def standalone():
 
 
 def quit():
-    """Quits Editor"""
+    """Quit Editor."""
     pygame.quit()
     sys.exit()
 

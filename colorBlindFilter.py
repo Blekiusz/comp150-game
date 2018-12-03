@@ -1,12 +1,16 @@
+"""COLOUR BLIND FILTER."""
 import pygame
 import main
 
 
 class CBFilterStore:
+    """Storage class."""
+
     surface = None
 
 
-def greyscale_pixel(pixel_color): # Changes the colour of the screenshot to the grey scale filter
+def greyscale_pixel(pixel_color):
+    """Change the colour of the screenshot to the grey scale filter."""
     red = pixel_color[0]
     green = pixel_color[1]
     blue = pixel_color[2]
@@ -16,7 +20,8 @@ def greyscale_pixel(pixel_color): # Changes the colour of the screenshot to the 
     return greyscale, greyscale, greyscale
 
 
-def protanopia_pixel(pixel_color): # Changes the colour of the screenshot to the protanopia filter
+def protanopia_pixel(pixel_color):
+    """Change the colour of the screenshot to the protanopia filter."""
     red = pixel_color[0]
     green = pixel_color[1]
     blue = pixel_color[2]
@@ -26,7 +31,8 @@ def protanopia_pixel(pixel_color): # Changes the colour of the screenshot to the
     return protanopia
 
 
-def deuteranopia_pixel(pixel_color): # Changes the colour of the screenshot to the deuteranopia filter
+def deuteranopia_pixel(pixel_color):
+    """Change the colour of the screenshot to the deuteranopia filter."""
     red = pixel_color[0]
     green = pixel_color[1]
     blue = pixel_color[2]
@@ -36,7 +42,8 @@ def deuteranopia_pixel(pixel_color): # Changes the colour of the screenshot to t
     return deuteranopia
 
 
-def tritanopia_pixel(pixel_color):# Changes the colour of the screenshot to the tritanopia filter
+def tritanopia_pixel(pixel_color):
+    """Change the colour of the screenshot to the tritanopia filter."""
     red = pixel_color[0]
     green = pixel_color[1]
     blue = pixel_color[2]
@@ -46,8 +53,9 @@ def tritanopia_pixel(pixel_color):# Changes the colour of the screenshot to the 
     return tritanopia
 
 
-def loop_image(): # Press "P" and it'll load 4 pictures in the Screenshot folder
-    # Loops through all the images and colours them accordingly
+# Press "P" and it'll load 4 pictures in the Screenshot folder
+def loop_image():
+    """Loop through all the images and colour them accordingly."""
     image = pygame.image.load("ColorBlind.png")
     tritan_image = pygame.image.load("ColorBlind.png")
     deuter_image = pygame.image.load("ColorBlind.png")
@@ -88,14 +96,18 @@ def loop_image(): # Press "P" and it'll load 4 pictures in the Screenshot folder
 
 
 def initialization():
-    CBFilterStore.surface = pygame.Surface((main.WINDOW_WIDTH, main.WINDOW_HEIGHT))
+    """Initialize the image surface."""
+    CBFilterStore.surface = pygame.Surface(
+        (main.WINDOW_WIDTH, main.WINDOW_HEIGHT))
 
 
 def color_blind_filter():
+    """Apply the color blind filter."""
     CBFilterStore.surface.blit(main.screen, (0, 0))
     save(".", "ColorBlind", CBFilterStore.surface)
 
 
-def save(path, file_name, surf): # Saves the screenshot
+def save(path, file_name, surf):
+    """Save the screenshot."""
     pygame.image.save(surf, path + "/" + file_name + ".png")
     print("saving image")

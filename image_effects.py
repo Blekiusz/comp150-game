@@ -1,4 +1,4 @@
-"""Driver Ashley Sands; Navigator: None"""
+"""Driver Ashley Sands; Navigator: None."""
 import pygame
 import math
 import library
@@ -6,7 +6,8 @@ import library
 
 def gray_scale_image(pixel_color, color_weight=(1, 1, 1)):
     """
-    grey scales an image
+    Grey scale an image.
+
     :param pixel_color:     color of pixel
     :param color_weight:    color channel weights
     :return:                gray scale image (r, g, b, a)
@@ -30,7 +31,8 @@ def gray_scale_image(pixel_color, color_weight=(1, 1, 1)):
 
 def distance(color_base, color_comparitor):
     """
-    it does ent matter what way base and comparitor are
+    It does not matter what way base and comparitor are.
+
     :param color_base:          Color to remove
     :param color_comparitor:    Color to test
     :return:                    difference
@@ -44,6 +46,7 @@ def distance(color_base, color_comparitor):
 
 def close_enough(pixle_color, color_comparitor, tolerance):
     """
+    Check if the pixel colour is close enough to the comparitor.
 
     :param pixle_color:         color
     :param color_comparitor:    color to test agants
@@ -57,6 +60,7 @@ def close_enough(pixle_color, color_comparitor, tolerance):
 
 
 def change_color(color_base, color_comparitor, tolerance, replace_color):
+    """Change the colour of the image."""
     if close_enough(color_base, color_comparitor, tolerance):
         # return color [2, 1, 0, 3] this prevents the red and blue
         # channels from flipping
@@ -71,6 +75,7 @@ def change_color(color_base, color_comparitor, tolerance, replace_color):
 
 def posterization(new_color_amount, pixel_color):
     """
+    Posterize the image.
 
     :param new_color_amount: Tuple of 3 amouts [0] = min, [1] = mid, [2] = max
     :param pixel_color: the current pixel color
@@ -95,6 +100,7 @@ def posterization(new_color_amount, pixel_color):
 def posterization_color_distance(new_color, pixel_color,
                                  color_comparitor, tolerance):
     """
+    Second posterization algorithm.
 
     :param new_color: there needs to be one more color than tollerances
     :param pixel_color:
@@ -103,7 +109,6 @@ def posterization_color_distance(new_color, pixel_color,
      must be in order smallest to largest
     :return:    new color (r, g, b, a)
     """
-
     for t in range(len(tolerance)):
         if close_enough(pixel_color, color_comparitor, tolerance[t]):
             # return color [2, 1, 0, 3] this prevents the red and blue
@@ -122,6 +127,7 @@ def posterization_color_distance(new_color, pixel_color,
 def tint_image(pixel_color, color_weight=(1.1, 0.9, 1),
                tones=(62, 191), base_color_id=0):
     """
+    Tint the image.
 
     :param pixel_color:     color to update
     :param color_weight:    rgb
@@ -130,7 +136,6 @@ def tint_image(pixel_color, color_weight=(1.1, 0.9, 1),
     (does nothing if image is grayscale)
     :return:                new color.
     """
-
     if pixel_color[base_color_id] < tones[0]:
         pixel_color = multiply_color(pixel_color, color_weight)
 
@@ -147,7 +152,8 @@ def tint_image(pixel_color, color_weight=(1.1, 0.9, 1),
 
 def blur(x, y, amount, image, tolerance=0):
     """
-    blurs an image
+    Blur an image.
+
     :param x:           current X axis pixel id
     :param y:           current Y axis puxel id
     :param amount:      the amount of blue (0-n)
@@ -155,7 +161,6 @@ def blur(x, y, amount, image, tolerance=0):
     (or a dif image of the same size for a funky effect)
     :return:            blued pixel
     """
-
     # set p to count the amount of pixels in the tolerance range
     p = 0
     # store the current pixel so it can be tested against it neighboring pixels
@@ -202,14 +207,11 @@ def blur(x, y, amount, image, tolerance=0):
     return int(temp_col[0]), int(temp_col[1]), int(temp_col[2]), trans
 
 
-def outline_image():
-    pass
-
-
 def transparency_by_color_distance(pixel_color, color_comparitor,
                                    tolerance, new_alpha):
     """
-    set the alpha if the pixel_color is in range of the color_comparitor
+    Set the alpha if the pixel_color is in range of the color_comparitor.
+
     :param pixel_color:         current pixel color
     :param color_comparitor:    color to test against pixel color
     :param tolerance:           the tolerance (0 - 1)
@@ -224,7 +226,8 @@ def transparency_by_color_distance(pixel_color, color_comparitor,
 
 def add_color(color_a, color_b, clamp=True):
     """
-    Add two colors together (ignores alpha)
+    Add two colors together (ignores alpha).
+
     :param color_a:
     :param color_b:
     :param clamp:       should the color be clamped to 0-255
@@ -244,12 +247,12 @@ def add_color(color_a, color_b, clamp=True):
 
 def div_color(color_a, by):
     """
-    divides a color by
+    Divide a color by.
+
     :param color_a:     the color
     :param by:          the amount to divide by
     :return:            new color
     """
-
     color_a = list(color_a)
 
     color_a[0] //= by
@@ -261,7 +264,8 @@ def div_color(color_a, by):
 
 def multiply_color(pixel_color, color_weights):
     """
-    Multiply the color chanel by color weight
+    Multiply the color chanel by color weight.
+
     :param pixel_color:     (r, g, b) color
     :param color_weights:   weights tuple (r, g, b)
     :return:                weighted color
@@ -274,12 +278,12 @@ def multiply_color(pixel_color, color_weights):
 
 
 def correct_color_value(color_value):
-    """makes shore that the color values are ints"""
+    """Make sure that the color values are ints."""
     return int(color_value[0]), int(color_value[1]), int(color_value[2])
 
 
 def clamp255_color(pixel_color):
-    """clamps color chanel to 255"""
+    """Clamp color channel to 255."""
     # make shore that pixel color is list so we can edit it
     pixel_color = list(pixel_color)
     for c in range(3):
@@ -289,7 +293,7 @@ def clamp255_color(pixel_color):
 
 
 def clamp0_color(pixel_color):
-    """clamps color chanel to 0"""
+    """Clamp color channel to 0."""
     # make shore that pixel color is list so we can edit it
     pixel_color = list(pixel_color)
     for c in range(3):
@@ -301,7 +305,8 @@ def clamp0_color(pixel_color):
 def run_effect(effect_name, image_to_update,
                effect_inputs=None, loading_function=None):
     """
-    Runs a single effect
+    Run a single effect.
+
     :param effect_name:         name of effect to run
     :param image_to_update:     image to be updated
     :param effect_inputs:       inputs for applied fx.
@@ -311,7 +316,6 @@ def run_effect(effect_name, image_to_update,
     if none then not displayed
     :return:                    None
     """
-
     # if the effect type is blur make a copy of the image to pass into the
     # blur function to prevent it from blurring from an already blurred pixel
     if effect_name == "blur" or effect_name == "blue_distance":

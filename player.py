@@ -1,3 +1,4 @@
+"""PLAYER."""
 import pyBehaviour
 import library
 import pygame
@@ -5,6 +6,7 @@ from animator import Animator
 
 
 class Player(pyBehaviour.Transform):
+    """Main player class."""
 
     previous_position = (0, 0)
 
@@ -99,15 +101,14 @@ class Player(pyBehaviour.Transform):
     )
 
     def __init__(self, move_speed, scale, time_manager):
-
+        """Initialize."""
         self.move_speed = move_speed
         self.scale = scale
         self.time_manager = time_manager
         self.get_world_position_funct = None
 
     def block_move_direction(self, forwards, right, backwards, left):
-        """"""
-
+        """Block movement based on the passed directions."""
         self.blocked_move_direct["forwards"] = forwards
         self.blocked_move_direct["right"] = right
         self.blocked_move_direct["backwards"] = backwards
@@ -125,11 +126,13 @@ class Player(pyBehaviour.Transform):
             self.animation[last_dir].reset()
         return current_dir
 
-    def animation_direction(self, last_direction, inputs):
+    @staticmethod
+    def animation_direction(last_direction, inputs):
         """
         Get the next animation direction.
 
-        this prevents it from resetting if two keys are pressed at the same time!
+        this prevents it from resetting
+        if two keys are pressed at the same time!
         :param last_direction:  players last direction
         :param inputs:          user inputs.
         :return:                (Direction, idle)
@@ -173,7 +176,7 @@ class Player(pyBehaviour.Transform):
         return direction, idle
 
     def update(self, inputs):
-
+        """Update."""
         self.previous_position = self.position
 
         next_animation_direction, self.idle = self.animation_direction(
@@ -201,39 +204,35 @@ class Player(pyBehaviour.Transform):
     # Key Actions (up, down, left, right)
 
     def forwards(self):
-        """Up key action"""
-
+        """Up key action."""
         if self.blocked_move_direct["forwards"]:
             return
 
         self.position[1] -= self.time_manager.delta_time * self.move_speed
 
     def right(self):
-        """Right key action"""
-
+        """Right key action."""
         if self.blocked_move_direct["right"]:
             return
 
         self.position[0] += self.time_manager.delta_time * self.move_speed
 
     def backwards(self):
-        """Down key action"""
-
+        """Down key action."""
         if self.blocked_move_direct["backwards"]:
             return
 
         self.position[1] += self.time_manager.delta_time * self.move_speed
 
     def left(self):
-        """Left key action"""
-
+        """Left key action."""
         if self.blocked_move_direct["left"]:
             return
 
         self.position[0] -= self.time_manager.delta_time * self.move_speed
 
     def draw(self, tile_size, surface):
-
+        """Draw the player."""
         if self.idle:
             current_animation = self.idle_animation[self.current_direction]
         else:

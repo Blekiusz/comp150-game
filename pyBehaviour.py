@@ -1,12 +1,14 @@
+"""BEHAVIOURS."""
+
 
 class PyBehaviour:
+    """Main behaviour class."""
 
     def update(self, inputs):
-        """Update PyBehaviour
+        """Update PyBehaviour.
 
         :param inputs: user inputs
         """
-        
         if inputs["forwards"]:
             self.forwards()
 
@@ -20,19 +22,24 @@ class PyBehaviour:
             self.left()
 
     def forwards(self):
+        """Forwards."""
         pass
 
     def right(self):
+        """Right."""
         pass
 
     def backwards(self):
+        """Backwards."""
         pass
 
     def left(self):
+        """Left."""
         pass
 
 
 class Transform(PyBehaviour):
+    """Transform behaviour class."""
 
     position = [0, 0]
     rotation = 0

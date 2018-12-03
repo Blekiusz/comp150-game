@@ -1,8 +1,9 @@
+"""SPRITE SHEET ANIMATOR."""
 import pygame
 
 
 class Animator:
-    """Stop-motion animator from sprite sheets"""
+    """Stop-motion animator from sprite sheets."""
 
     # sprite sheet use for the animation
     animation_sheet = ""
@@ -21,12 +22,17 @@ class Animator:
     # current time of the frame
     current_frame_time = 0
 
-    def __init__(self, animation_sheet_src, size, spacing, sprite_count, length):
-        """initialize the animator
+    def __init__(self, animation_sheet_src, size, spacing,
+                 sprite_count, length):
+        """
+        Initialize the animator.
+
         Args
         :param animation_sheet_src:    Sprite directory
-        :param size:                   size of the sprite to extract form the sprite sheet (px)
-        :param spacing:                space in-between sprites in sprite sheet (px)
+        :param size:                   size of the sprite
+         to extract from the sprite sheet (px)
+        :param spacing:                space in-between sprites
+         in sprite sheet (px)
         :param sprite_count:            amount of sprites in sprite sheet
         :param length:                 total animation length (seconds)
         """
@@ -45,8 +51,10 @@ class Animator:
 
     def update_time(self, delta_time):
         """
-        Updates the animator timer and current frame id
-        :param delta_time:      The amount of time that has passe since the last update
+        Update the animator timer and current frame id.
+
+        :param delta_time:      The amount of time that has passed
+         since the last update
         """
         # update the frame time
         self.current_frame_time += delta_time
@@ -65,16 +73,17 @@ class Animator:
             self.current_frame_time -= self.frame_length
 
     def reset(self):
-        """Reset the animator back to its start state"""
+        """Reset the animator back to its start state."""
         # reset the current frame id
         self.current_frame_id = 0
         # reset the current frame time.
         self.current_frame_time = 0
 
     def get_current_sprite(self):
-        """returns the current sprite from the sprite sheet"""
-        return self.animation_sheet.subsurface(((self.sprite_size * self.current_frame_id)+
-                                                (self.sprite_spacing*self.current_frame_id),
-                                                0, self.sprite_size, self.sprite_size))
-
-
+        """Return the current sprite from the sprite sheet."""
+        return self.animation_sheet.subsurface(((self.sprite_size *
+                                                 self.current_frame_id) +
+                                                (self.sprite_spacing *
+                                                 self.current_frame_id),
+                                                0, self.sprite_size,
+                                                self.sprite_size))
